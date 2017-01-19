@@ -22,6 +22,7 @@ import pty
 import signal
 import sys
 import termios
+import re
 
 from polysh.buffered_dispatcher import buffered_dispatcher
 from polysh import callbacks
@@ -310,6 +311,17 @@ class remote_dispatcher(buffered_dispatcher):
     def dispatch_write(self, buf):
         """There is new stuff to write when possible"""
         if self.state != STATE_DEAD and self.enabled and self.allow_write:
+            dispatch_cmd = buf.split(' ')[0].strip()
+            if re.match(r'^[a-z].*$',dispatch_cmd) and 'exit'!=dispatch_cmd and 'quit'!=dispatch_cmd:
+                if ((options.black_list) and (dispatch_cmd in options.black_list.split(','))):
+                    if self.debug:
+                        self.print_debug('dispatch_cmd %s in black_list' % dispatch_cmd)
+                    return False
+                if ((options.white_list) and not (dispatch_cmd in options.white_list.split(','))):
+                    if self.debug:
+                        self.print_debug('dispatch_cmd %s not in white_list' % dispatch_cmd)
+                    return False
+
             buffered_dispatcher.dispatch_write(self, buf)
             return True
 

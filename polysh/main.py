@@ -80,6 +80,10 @@ def parse_cmdline():
                       help='print debugging information')
     parser.add_option('--profile', action='store_true', dest='profile',
                       default=False, help=optparse.SUPPRESS_HELP)
+    parser.add_option('--wlist', type='str', dest='white_list', default=None,
+                      help='enable white list of command')
+    parser.add_option('--blist', type='str', dest='black_list', default=None,
+                      help='disable black list of command')
 
     options, args = parser.parse_args()
     for filename in options.hosts_filenames:
